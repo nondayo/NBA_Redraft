@@ -47,6 +47,7 @@ str(df_full)
 df <- select(df_full, Rk, Tm, Player, College, MP_T, VORP, Year)
 
 #Dealing with missing values
+#有些是高中畢業就進NBA，有些是非美籍球員
 #1989
 df$College[df$Player == "Vlade Divac"] <- "International"
 df$College[df$Player == "Dino Radja"] <- "International"
@@ -258,7 +259,7 @@ df$College[df$Player == "Goran Dragic"] <- "International"
 df$College[df$Player == "Tadija Dragicevic"] <- "International"
 df$College[df$Player == "Semih Erden"] <- "International"
 
-#把Redraft不要依照unique重排
+#做出Redraft欄位，依年份、Redraft順位排序
 tables_test2 = lapply(c(1989:2008) ,function(yr){
               df_2 <- subset(df, Year == yr) 
               df_2 <- df_2[order(-df_2$VORP), ]
@@ -294,7 +295,7 @@ p3 <- ggplot(data = df_redraft3, aes(Rk, Redraft)) +
 p3
 
 
-#MP_T > 1000
+#上場時間少於1000分鐘的不列入。MP_T > 1000
 df_redraft4 <- subset(df_redraft2, MP_T > 1000)
 p4 <- ggplot(data = df_redraft4, aes(Redraft, Rk)) +
      scale_y_continuous(name="Rk", limits=c(0,60)) +
