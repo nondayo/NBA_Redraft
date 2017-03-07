@@ -1,3 +1,4 @@
+
 library(xml2) 
 library(dplyr)
 library(ggplot2)
@@ -17,10 +18,8 @@ tables = lapply(c(1989:2008) ,function(yr){
       df
 })
 
-str(tables)
-
-
 df_full <- Reduce(x = tables, f = rbind)
+
 
 df_full$Rk <- as.numeric(df_full$Rk)
 df_full$Yrs <- as.numeric(df_full$Yrs)
@@ -45,6 +44,7 @@ df_full$Year <- as.numeric(df_full$Year)
 str(df_full)
 
 df <- select(df_full, Rk, Tm, Player, College, MP_T, VORP, Year)
+
 
 #Dealing with missing values
 #有些是高中畢業就進NBA，有些是非美籍球員
@@ -273,34 +273,36 @@ tables_test1 = lapply(c(1989:2008) ,function(yr){
 })
 
 df_redraft2 <- Reduce(x = tables_test1, f = rbind)
+
+
 #Rank - Redraft
 p2 <- ggplot(data = df_redraft2, aes(Redraft, Rk)) +
      scale_y_continuous(name="Rk", limits=c(0,60)) +
      scale_x_continuous(name="Redraft", limits=c(0,60)) +
-     geom_abline(data=df_redraft, mapping=aes(slope = 1, intercept = 0)) +
+     geom_abline(data=df_redraft2, mapping=aes(slope = 1, intercept = 0)) +
      geom_point()      
 
 p2
 #斜線上方是表現比預期好的球員，斜線下方是表現比預期差的球員。
+
 
 #omit NA
 df_redraft3 <- na.omit(df_redraft2)
 p3 <- ggplot(data = df_redraft3, aes(Rk, Redraft)) +
      scale_x_continuous(name="Rk", limits=c(0,60)) +
      scale_y_continuous(name="Redraft", limits=c(0,60)) +
-     geom_abline(data=df_redraft, mapping=aes(slope = 1, intercept = 0)) +
+     geom_abline(data=df_redraft3, mapping=aes(slope = 1, intercept = 0)) +
      geom_point() +     
      coord_flip()
 
 p3
-
 
 #上場時間少於1000分鐘的不列入。MP_T > 1000
 df_redraft4 <- subset(df_redraft2, MP_T > 1000)
 p4 <- ggplot(data = df_redraft4, aes(Redraft, Rk)) +
      scale_y_continuous(name="Rk", limits=c(0,60)) +
      scale_x_continuous(name="Redraft", limits=c(0,60)) +
-     geom_abline(data=df_redraft, mapping=aes(slope = 1, intercept = 0)) +
+     geom_abline(data=df_redraft4, mapping=aes(slope = 1, intercept = 0)) +
      geom_point()    
   
 p4
@@ -330,6 +332,7 @@ tables_test3 = lapply(c(1989:2008) ,function(yr){
 df_BustSteal2 <- Reduce(x = tables_test3, f = rbind)
 df_BustSteal2 <- na.omit(df_BustSteal3)
 
+
 #Team Bust/Steal Value
 team <- unique(df_BustSteal2$Tm)
 tables_test4 = lapply(team ,function(tm){
@@ -344,6 +347,7 @@ tables_test4 = lapply(team ,function(tm){
 
 df_teamVORPsum <- Reduce(x = tables_test4, f = rbind)
 
+
 #The Best Year
 tables_test5 = lapply(c(1989:2008) ,function(yr){
   df_test <- na.omit(subset(df_redraft2, Year==yr))
@@ -356,6 +360,7 @@ df_meanVORP_total <- Reduce(x = tables_test5, f = rbind)
 colnames(df_meanVORP_total) <- c("meanVORP")
 df_meanVORP_total$Year <- c(1989:2008) 
 head(df_meanVORP_total , 60)
+
 
 #Top 10 
 tables_test6 = lapply(c(1989:2008) ,function(yr){
@@ -370,7 +375,7 @@ tables_test6 = lapply(c(1989:2008) ,function(yr){
 
 df_meanVORP_topten <- Reduce(x = tables_test6, f = rbind)
 colnames(df_meanVORP_topten) <- c("meanVORP")
-df_meanVORP$Year <- c(1989:2008) 
+df_meanVORP_topten$Year <- c(1989:2008) 
 head(df_meanVORP_topten , 60)
 
 #Top 5
@@ -388,3 +393,6 @@ df_meanVORP_topfive <- Reduce(x = tables_test7, f = rbind)
 colnames(df_meanVORP_topfive) <- c("meanVORP")
 df_meanVORP_topfive$Year <- c(1989:2008) 
 head(df_meanVORP_topfive , 60)
+
+
+
