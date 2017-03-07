@@ -260,7 +260,7 @@ df$College[df$Player == "Tadija Dragicevic"] <- "International"
 df$College[df$Player == "Semih Erden"] <- "International"
 
 #做出Redraft欄位，依年份、Redraft順位排序
-tables_test2 = lapply(c(1989:2008) ,function(yr){
+tables_test1 = lapply(c(1989:2008) ,function(yr){
               df_2 <- subset(df, Year == yr) 
               df_2 <- df_2[order(-df_2$VORP), ]
               df_Redraft = data.frame(VORP = df_2$VORP, Redraft=c(1:length(df_2$VORP)), Player = df_2$Player)
@@ -272,7 +272,7 @@ tables_test2 = lapply(c(1989:2008) ,function(yr){
               df_2
 })
 
-df_redraft2 <- Reduce(x = tables_test2, f = rbind)
+df_redraft2 <- Reduce(x = tables_test1, f = rbind)
 #Rank - Redraft
 p2 <- ggplot(data = df_redraft2, aes(Redraft, Rk)) +
      scale_y_continuous(name="Rk", limits=c(0,60)) +
@@ -304,3 +304,87 @@ p4 <- ggplot(data = df_redraft4, aes(Redraft, Rk)) +
      geom_point()    
   
 p4
+
+#Player's Bust/Steal Value
+tables_test3 = lapply(c(1989:2008) ,function(yr){
+    df_yr <- subset(df_redraft2, Year == yr)
+    
+    df_1 <- subset(df_redraft2, Year == yr)   
+    df_1 <- data.frame(cbind(df_1[, 1], df_1[, 6]))
+    colnames(df_1) <- c("Rk", "VORP_a")
+    df_1 <- df_1[order(df_1$Rk), ]
+    
+    df_2 <- subset(df_redraft2, Year == yr) 
+    df_2 <- data.frame(cbind(df_2[, 8], df_2[, 6]))
+    colnames(df_2) <- c("Redraft", "VORP_re")
+            
+    df_test <- cbind(df_1, df_2)
+    df_test$BustSteal <- df_test$VORP_a - df_test$VORP_re
+    df_test <- df_test[c("Rk", "BustSteal")]
+    
+    df_yr <- left_join(df_yr, df_test)
+    
+    df_yr
+})
+
+df_BustSteal2 <- Reduce(x = tables_test3, f = rbind)
+df_BustSteal2 <- na.omit(df_BustSteal3)
+
+#Team Bust/Steal Value
+team <- unique(df_BustSteal2$Tm)
+tables_test4 = lapply(team ,function(tm){
+              df <- subset(df_BustSteal2, Tm == tm) 
+              df_teamVORPsum <- sum(df$VORP) %>%
+                                as.data.frame(stringsAsFactors=FALSE) %>%
+                                cbind(tm)
+              colnames(df_teamVORPsum) <- c("teamVORP", "Tm")
+              
+        df_teamVORPsum
+})
+
+df_teamVORPsum <- Reduce(x = tables_test4, f = rbind)
+
+#The Best Year
+tables_test5 = lapply(c(1989:2008) ,function(yr){
+  df_test <- na.omit(subset(df_redraft2, Year==yr))
+  maenVORP <- mean(df_test$VORP) %>%
+    as.data.frame(stringsAsFactors=FALSE)
+  
+  maenVORP 
+})
+df_meanVORP_total <- Reduce(x = tables_test5, f = rbind)
+colnames(df_meanVORP_total) <- c("meanVORP")
+df_meanVORP_total$Year <- c(1989:2008) 
+head(df_meanVORP_total , 60)
+
+#Top 10 
+tables_test6 = lapply(c(1989:2008) ,function(yr){
+              df_test4 <-subset(df_redraft2, Year==yr) %>%
+                         na.omit() 
+
+              df_test4 <-subset(df_test4[c(1:10),]) 
+              maenVORP <- mean(df_test4$VORP) %>%
+                          as.data.frame(stringsAsFactors=FALSE)
+              maenVORP 
+})
+
+df_meanVORP_topten <- Reduce(x = tables_test6, f = rbind)
+colnames(df_meanVORP_topten) <- c("meanVORP")
+df_meanVORP$Year <- c(1989:2008) 
+head(df_meanVORP_topten , 60)
+
+#Top 5
+tables_test7 = lapply(c(1989:2008) ,function(yr){
+              df_test4 <-subset(df_redraft2, Year==yr) %>%
+                         na.omit() 
+
+              df_test4 <-subset(df_test4[c(1:5),]) 
+              maenVORP <- mean(df_test4$VORP) %>%
+                          as.data.frame(stringsAsFactors=FALSE)
+              maenVORP 
+})
+
+df_meanVORP_topfive <- Reduce(x = tables_test7, f = rbind)
+colnames(df_meanVORP_topfive) <- c("meanVORP")
+df_meanVORP_topfive$Year <- c(1989:2008) 
+head(df_meanVORP_topfive , 60)
