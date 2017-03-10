@@ -1,5 +1,5 @@
-
 library(xml2) 
+library(magrittr)
 library(dplyr)
 library(ggplot2)
 
@@ -17,35 +17,12 @@ tables = lapply(c(1989:2008) ,function(yr){
                     'WS', 'WS_per', 'BPM', 'VORP','Year')
       df
 })
-
 df_full <- Reduce(x = tables, f = rbind)
 
-
-df_full$Rk <- as.numeric(df_full$Rk)
-df_full$Yrs <- as.numeric(df_full$Yrs)
-df_full$G <- as.numeric(df_full$G)
-df_full$MP_T <- as.numeric(df_full$MP_T)
-df_full$PTS_T <- as.numeric(df_full$PTS_T)
-df_full$TRB_T <- as.numeric(df_full$TRB_T)
-df_full$AST_T <- as.numeric(df_full$AST_T)
-df_full$FG <- as.numeric(df_full$FG)
-df_full$threeP <- as.numeric(df_full$threeP)
-df_full$FT <- as.numeric(df_full$FT)
-df_full$MP <- as.numeric(df_full$MP)
-df_full$PTS <- as.numeric(df_full$PTS)
-df_full$TRB <- as.numeric(df_full$TRB)
-df_full$AST <- as.numeric(df_full$AST)
-df_full$WS <- as.numeric(df_full$WS)
-df_full$WS_per <- as.numeric(df_full$WS_per)
-df_full$BPM <- as.numeric(df_full$BPM)
-df_full$VORP <- as.numeric(df_full$VORP)
-df_full$Year <- as.numeric(df_full$Year)
-
-str(df_full)
-
+cols = c(1, 5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22)
+df_full[,cols] %<>% lapply(function(x) as.numeric(as.character(x)))
 df <- select(df_full, Rk, Tm, Player, College, MP_T, VORP, Year)
-
-
+      
 #Dealing with missing values
 #有些是高中畢業就進NBA，有些是非美籍球員
 #1989
